@@ -139,6 +139,8 @@ public class Container extends JPanel implements ActionListener {
         this.setPreferredSize(new Dimension(SCREEN_WIDTH,SCREEN_HEIGHT));
         this.setFocusable(true);
         this.addKeyListener(new ControlAdapter());
+
+        start_game();
     }
 
 
