@@ -1,3 +1,4 @@
+
 /**
  * Snake2D
  *  Game panel
@@ -66,13 +67,13 @@ public class Container extends JPanel implements ActionListener {
     /**
      * x axis
      */
-    final int x[] = new int[GAME_UNITS];
+    final int[] x = new int[GAME_UNITS];
 
 
     /**
      * y axis
      */
-    final int y[] = new int[GAME_UNITS];
+    final int[] y = new int[GAME_UNITS];
 
 
     /**
@@ -135,11 +136,12 @@ public class Container extends JPanel implements ActionListener {
         rand_num = new Random();
 
         //setting up the panel
-        this.setBackground(new Color(27,27,27));
+        this.setBackground(new Color(31,27,34));
         this.setPreferredSize(new Dimension(SCREEN_WIDTH,SCREEN_HEIGHT));
         this.setFocusable(true);
         this.addKeyListener(new ControlAdapter());
 
+        //start the game
         start_game();
     }
 
@@ -157,7 +159,7 @@ public class Container extends JPanel implements ActionListener {
         is_running = true;
 
         //set the timer to start the time
-        time = new Timer(10,this);
+        time = new Timer(SPEED,this);
         time.start();
     }
 
@@ -171,7 +173,7 @@ public class Container extends JPanel implements ActionListener {
         //paint the super class components on the screen
         super.paintComponent(gr);
 
-        //draw the grahics
+        //draw the graphics
         draw(gr);
     }
 
@@ -185,18 +187,24 @@ public class Container extends JPanel implements ActionListener {
     public void draw(Graphics gr) {
         if(is_running) {
             //draw the apple on the screen
-            gr.setColor(new Color(78,34,160));
+            gr.setColor(new Color(230,34,70));
             gr.fillOval(appleX,appleY,UNIT_SIZE,UNIT_SIZE);
+
+            //draw the scores on the screen
+            gr.setColor(new Color(200,200,200));
+            gr.setFont(new Font("Fira Code",Font.ITALIC,20));
+            FontMetrics scr_met = getFontMetrics(gr.getFont());
+            gr.drawString("Scores : " + apples_eaten,(SCREEN_WIDTH - scr_met.stringWidth("Scores : " + apples_eaten)) / 2, gr.getFont().getSize());
 
             //draw the snake on the screen
             for(int i = 0; i < body_parts; i++){
                 //snake's head
                 if(i == 0){
-                    gr.setColor(new Color(100,10,80));
-                    gr.fillOval(x[i],y[i],UNIT_SIZE,UNIT_SIZE);
+                    gr.setColor(new Color(100,160,180));
+                    gr.fill3DRect(x[i],y[i],UNIT_SIZE,UNIT_SIZE,false);
                 }else {
-                    gr.setColor(new Color(50,150,120));
-                    gr.fillRect(x[i],y[i],UNIT_SIZE,UNIT_SIZE);
+                    gr.setColor(new Color(100,200,120));
+                    gr.fill3DRect(x[i],y[i],UNIT_SIZE,UNIT_SIZE,false);
                 }
             }
         }else {
@@ -247,7 +255,7 @@ public class Container extends JPanel implements ActionListener {
                 break;
             case 'R':
                 x[0] += UNIT_SIZE;
-                break;
+            break;
         }
     }
 
@@ -314,14 +322,13 @@ public class Container extends JPanel implements ActionListener {
     public void game_over(Graphics gr) {
         //draw the scores
         gr.setColor(new Color(200,200,200));
-        gr.setFont(new Font("Fira Code",Font.PLAIN,25));
-
+        gr.setFont(new Font("Latin Modern",Font.ITALIC,25));
         FontMetrics scores_metrics = getFontMetrics(gr.getFont());
         gr.drawString("Scores : " + apples_eaten,(SCREEN_WIDTH - scores_metrics.stringWidth("Scores : " + apples_eaten)) / 2,gr.getFont().getSize());
 
         //draw "Game over!" on the screen
-        gr.setColor(Color.red);
-        gr.setFont(new Font("Fira Code",Font.BOLD,30));
+        gr.setColor(new Color(210,20,40));
+        gr.setFont(new Font("MathJax_Typewriter",Font.PLAIN,30));
         FontMetrics game_over_metrics = getFontMetrics(gr.getFont());
         gr.drawString("Game over!",(SCREEN_WIDTH - game_over_metrics.stringWidth("Game over!")) / 2,SCREEN_HEIGHT / 2);
     }
