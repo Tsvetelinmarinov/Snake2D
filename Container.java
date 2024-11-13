@@ -49,7 +49,7 @@ public class Container extends JPanel implements ActionListener {
     /**
      * Size of the one unit
      */
-    static final int UNIT_SIZE = 25;
+    static final int UNIT_SIZE = 20;
 
 
     /**
@@ -61,7 +61,7 @@ public class Container extends JPanel implements ActionListener {
     /**
      * Snake speed
      */
-    static final int SPEED = 75;
+    static final int SPEED = 120;
 
 
     /**
