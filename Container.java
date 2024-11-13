@@ -291,19 +291,19 @@ public class Container extends JPanel implements ActionListener {
 
         //check if the snake's head collides with the borders
         if(x[0] < 0) {
-            is_running = false;
+            x[0] = getWidth() - UNIT_SIZE;
         }
 
         if(x[0] > SCREEN_WIDTH) {
-            is_running = false;
+            x[0] = 0 - UNIT_SIZE;
         }
 
         if(y[0] < 0) {
-            is_running = false;
+            y[0] = getHeight() - UNIT_SIZE;
         }
 
         if(y[0] > SCREEN_HEIGHT) {
-            is_running = false;
+            y[0] = 0 - UNIT_SIZE;
         }
 
 
