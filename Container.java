@@ -225,7 +225,7 @@ public class Container extends JPanel implements ActionListener {
         appleX = rand_num.nextInt((int)(SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
 
         //spawn apple on the y axis
-        appleX = rand_num.nextInt((int)(SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+        appleY = rand_num.nextInt((int)(SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
     }
 
 
