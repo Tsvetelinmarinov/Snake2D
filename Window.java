@@ -1,8 +1,7 @@
 /**
  * Snake2D
- *  Game window that contains the game panel
+ *  Game frame
  */
-
 
 package gamedata;
 
@@ -11,7 +10,7 @@ package gamedata;
 
 
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 
 
@@ -24,18 +23,19 @@ import javax.swing.*;
 public class Window extends JFrame {
 
 
-
     /**
      *
      */
-     Window(){
-         this.setTitle("Snake2D");
-         this.add(new Container());
-         this.setResizable(false);
-         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-         this.pack();
-         this.setVisible(true);
-         this.setLocationRelativeTo(null);
-     }
+    Window(){
+
+        this.add(new Container());
+        this.setTitle("Snake2D");
+        this.setResizable(false);
+        this.setSize(600,600);
+        this.setVisible(true);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+
+    }
 
 }
