@@ -1,6 +1,6 @@
 /**
  * Snake2D
- *  Simple game in Java
+ *  Control panel
  */
 
 package gamedata;
@@ -9,8 +9,7 @@ package gamedata;
 
 
 
-import java.awt.*;
-
+import java.awt.EventQueue;
 
 
 
@@ -28,21 +27,19 @@ public class ControlPanel {
      * @param args
      */
     public static void main(String[] args) {
-
         /**
-         * launch the application
+         * Launch the application
          */
         EventQueue.invokeLater(new Runnable(){
 
             /**
-             * Runs this operation.
+             *
              */
             @Override
             public void run() {
-                Window application = new Window();
+                Window app = new Window();
             }
         });
-
     }
 
 }
