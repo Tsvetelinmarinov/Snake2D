@@ -1,9 +1,7 @@
-
 /**
- * Snake2D
+ * Snake 2D
  *  Game panel
  */
-
 
 package gamedata;
 
@@ -13,10 +11,14 @@ package gamedata;
 
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Random;
-import javax.swing.Timer;
+
 
 
 
@@ -26,13 +28,31 @@ import javax.swing.Timer;
 /**
  *
  */
-public class Container extends JPanel implements ActionListener {
+public class Container extends JPanel implements ActionListener, MouseListener {
 
+    /**
+     * Menu panel
+     */
+    private JPanel menu_panel = new JPanel();
 
 
     /**
-     * @params
+     * Scores label
      */
+    private JLabel scores_lbl = new JLabel();
+
+
+    /**
+     * Menu bar
+     */
+    private JMenuBar menu_bar = new JMenuBar();
+
+
+    /**
+     * Main menu
+     */
+    private JMenu menu = new JMenu("Menu");
+
 
     /**
      * Screen width
@@ -47,15 +67,15 @@ public class Container extends JPanel implements ActionListener {
 
 
     /**
-     * Size of the one unit
+     * Size of one game unit
      */
     static final int UNIT_SIZE = 20;
 
 
     /**
-     * Game units
+     * Game units(quantity)
      */
-    static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
+    static final int UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
 
 
     /**
@@ -65,65 +85,64 @@ public class Container extends JPanel implements ActionListener {
 
 
     /**
-     * x axis
+     * x velocity
      */
-    final int[] x = new int[GAME_UNITS];
+    final int[] x_axis = new int[UNITS];
 
 
     /**
-     * y axis
+     * y velocity
      */
-    final int[] y = new int[GAME_UNITS];
+    final int[] y_axis = new  int[UNITS];
 
 
     /**
-     * starting length of the snake
-     */
-    int body_parts = 6;
-
-
-    /**
-     * Holds the eaten apples
-     */
-    int apples_eaten;
-
-
-    /**
-     * Apple on the x axix
+     * Apple on x velocity
      */
     int appleX;
 
 
     /**
-     * apple in the y axis
+     * Apple on y velocity
      */
     int appleY;
 
 
     /**
-     * direction of the snake
-     * start moving to the right
+     * Starting body parts of the snake
+     */
+    int body_parts = 6;
+
+
+    /**
+     * Scores
+     */
+    int scores = 0;
+
+
+    /**
+     * Main boolean
+     */
+    boolean isRunning = false;
+
+
+    /**
+     * Direction of the snake
+     *  starts moving right in the beginning
      */
     char direction = 'R';
 
 
     /**
-     * main boolean -- true(snake is running) : false(game over)
+     * Timer
      */
-    boolean is_running = false;
+    Timer tmr;
 
 
     /**
-     * Timer fot the ActionListener
-     */
-    Timer time;
-
-
-    /**
-     * Random number to spawn new apple random on the screen;
+     * Random number to spawn an apple
      */
     Random rand_num;
-
 
 
 
@@ -133,221 +152,64 @@ public class Container extends JPanel implements ActionListener {
      *
      */
     Container(){
+        //Initialize random number
         rand_num = new Random();
 
-        //setting up the panel
-        this.setBackground(new Color(31,27,34));
-        this.setPreferredSize(new Dimension(SCREEN_WIDTH,SCREEN_HEIGHT));
+        //Menu bar and panel
+        menu_panel.setBounds(-1,-1,600,35);
+        menu_panel.setBackground(new Color(32,30,34));
+        menu_panel.setBorder(BorderFactory.createLineBorder(new Color(78,34,160)));
+        menu_panel.setLayout(null);
+
+        //scores label
+        scores_lbl.setBounds(250,4,200,30);
+        scores_lbl.setFont(new Font("Fira Code",Font.ITALIC,27));
+        scores_lbl.setText("Scores " + scores);
+        scores_lbl.setForeground(Color.white);
+        scores_lbl.addMouseListener(this);
+        menu_panel.add(scores_lbl);
+
+        //menu bar
+        menu_bar.setBounds(0,0,50,33);
+        menu_bar.setBackground(new Color(32,30,34));
+        menu_bar.setBorder(null);
+        menu_panel.add(menu_bar);
+
+        //Main menu
+        menu.setFont(new Font("Fira Code",Font.PLAIN,18));
+        menu.setForeground(Color.white);
+        menu.setBackground(menu_bar.getBackground());
+        menu.setBorder(null);
+        menu.addMouseListener(this);
+        menu_bar.add(menu);
+
+        //setting up the container
+        this.setBackground(new Color(32,30,34));
         this.setFocusable(true);
+        this.setLayout(null);
         this.addKeyListener(new ControlAdapter());
+        this.setSize(SCREEN_WIDTH,SCREEN_HEIGHT);
+        this.add(menu_panel);
 
         //start the game
         start_game();
+
     }
 
 
 
 
     /**
-     *  Start the game
-     */
-    public void start_game() {
-        //Start the game with new apple
-        spawn_apple();
-
-        //run the game
-        is_running = true;
-
-        //set the timer to start the time
-        time = new Timer(SPEED,this);
-        time.start();
-    }
-
-
-
-
-    /**
-     * pain the components in the super class
-     */
-    public void paintComponent(Graphics gr) {
-        //paint the super class components on the screen
-        super.paintComponent(gr);
-
-        //draw the graphics
-        draw(gr);
-    }
-
-
-
-
-    /**
-     * Draw the snake and the scores on the screen
-     * Draw "Game Over!" when the game is over
-     */
-    public void draw(Graphics gr) {
-        if(is_running) {
-            //draw the apple on the screen
-            gr.setColor(new Color(230,34,70));
-            gr.fillOval(appleX,appleY,UNIT_SIZE,UNIT_SIZE);
-
-            //draw the scores on the screen
-            gr.setColor(new Color(200,200,200));
-            gr.setFont(new Font("Fira Code",Font.ITALIC,20));
-            FontMetrics scr_met = getFontMetrics(gr.getFont());
-            gr.drawString("Scores : " + apples_eaten,(SCREEN_WIDTH - scr_met.stringWidth("Scores : " + apples_eaten)) / 2, gr.getFont().getSize());
-
-            //draw the snake on the screen
-            for(int i = 0; i < body_parts; i++){
-                //snake's head
-                if(i == 0){
-                    gr.setColor(new Color(100,160,180));
-                    gr.fill3DRect(x[i],y[i],UNIT_SIZE,UNIT_SIZE,false);
-                }else {
-                    gr.setColor(new Color(100,200,120));
-                    gr.fill3DRect(x[i],y[i],UNIT_SIZE,UNIT_SIZE,false);
-                }
-            }
-        }else {
-            game_over(gr);
-        }
-    }
-
-
-
-
-
-    /**
-     * Spawns new apple in the beginning of the game
-     * Spawns new apple when the old one is eaten
-     */
-    public void spawn_apple(){
-        //spawn apple on the x axis
-        appleX = rand_num.nextInt((int)(SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
-
-        //spawn apple on the y axis
-        appleY = rand_num.nextInt((int)(SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
-    }
-
-
-
-
-
-    /**
-     *  Move
-     */
-    public void move() {
-        //main movement of the snake
-        for(int i = body_parts; i > 0; i--){
-            x[i] = x[i-1];
-            y[i] = y[i-1];
-        }
-
-        //switch the direction of the snake by @param char 'direction'
-        switch(direction){
-            case 'U':
-                y[0] -= UNIT_SIZE;
-                break;
-            case 'D':
-                y[0] += UNIT_SIZE;
-                break;
-            case 'L':
-                x[0] -= UNIT_SIZE;
-                break;
-            case 'R':
-                x[0] += UNIT_SIZE;
-            break;
-        }
-    }
-
-
-
-
-
-    /**
-     * Check for eaten apples
-     */
-    public void check_apple(){
-        if((x[0] == appleX) && (y[0] == appleY)){
-            apples_eaten++;
-            body_parts++;
-
-            spawn_apple();
-        }
-    }
-
-
-
-
-    /**
-     * Check for collisions of the snake head with her body or with borders
-     */
-    public void check_collision(){
-        //check if the snake's head collides with her body
-        for(int i = body_parts; i > 0; i--){
-            if((x[0] == x[i]) && (y[0] == y[i])){
-                is_running = false;
-            }
-        }
-
-        //check if the snake's head collides with the borders
-        if(x[0] < 0) {
-            x[0] = getWidth() - UNIT_SIZE;
-        }
-
-        if(x[0] > SCREEN_WIDTH) {
-            x[0] = 0 - UNIT_SIZE;
-        }
-
-        if(y[0] < 0) {
-            y[0] = getHeight() - UNIT_SIZE;
-        }
-
-        if(y[0] > SCREEN_HEIGHT) {
-            y[0] = 0 - UNIT_SIZE;
-        }
-
-
-        //stop the time if the main boolean is false(game should stop running)
-        if(!is_running){
-            time.stop();
-        }
-    }
-
-
-
-
-    /**
-     * Game over
-     */
-    public void game_over(Graphics gr) {
-        //draw the scores
-        gr.setColor(new Color(200,200,200));
-        gr.setFont(new Font("Latin Modern",Font.ITALIC,25));
-        FontMetrics scores_metrics = getFontMetrics(gr.getFont());
-        gr.drawString("Scores : " + apples_eaten,(SCREEN_WIDTH - scores_metrics.stringWidth("Scores : " + apples_eaten)) / 2,gr.getFont().getSize());
-
-        //draw "Game over!" on the screen
-        gr.setColor(new Color(210,20,40));
-        gr.setFont(new Font("MathJax_Typewriter",Font.PLAIN,30));
-        FontMetrics game_over_metrics = getFontMetrics(gr.getFont());
-        gr.drawString("Game over!",(SCREEN_WIDTH - game_over_metrics.stringWidth("Game over!")) / 2,SCREEN_HEIGHT / 2);
-    }
-
-
-
-
-
-    /**
-     * Invoked when an action occurs.
-     *
-     * @param e the event to be processed
+     * ------------------------ ActionListener ----------------------
+     * @param actionEvent
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if(is_running){
+    public void actionPerformed(ActionEvent actionEvent) {
+        if(isRunning){
             move();
+            check_coll();
             check_apple();
-            check_collision();
+            scores_lbl.setText("Scores " + scores);
         }
         repaint();
     }
@@ -358,21 +220,248 @@ public class Container extends JPanel implements ActionListener {
 
 
     /**
-     * Key adapter fot the control keys
+     * ------------------ Mouse Listener ------------------------
+     * @param mouseEvent
+     */
+    @Override
+    public void mouseClicked(MouseEvent mouseEvent) {
+
+    }
+
+    /**
+     * @param mouseEvent
+     */
+    @Override
+    public void mousePressed(MouseEvent mouseEvent) {
+
+    }
+
+    /**
+     * @param mouseEvent
+     */
+    @Override
+    public void mouseReleased(MouseEvent mouseEvent) {
+
+    }
+
+    /**
+     * @param mouseEvent
+     */
+    @Override
+    public void mouseEntered(MouseEvent mouseEvent) {
+        /**
+         * Scores label
+         */
+        if(mouseEvent.getSource() == scores_lbl) {
+            scores_lbl.setForeground(new Color(78,34,160));
+        }
+
+        /**
+         * Main menu
+         */
+        if(mouseEvent.getSource() == menu) {
+            menu.setForeground(new Color(78,34,160));
+        }
+    }
+
+    /**
+     * @param mouseEvent
+     */
+    @Override
+    public void mouseExited(MouseEvent mouseEvent) {
+        /**
+         * Scores label
+         */
+        if(mouseEvent.getSource() == scores_lbl) {
+            scores_lbl.setForeground(Color.white);
+        }
+
+        /**
+         * Main menu
+         */
+        if(mouseEvent.getSource() == menu) {
+            menu.setForeground(Color.white);
+        }
+    }
+
+
+
+
+
+    /**
+     *  Start the game
+     */
+    public void start_game(){
+        //run the game
+        isRunning = true;
+
+        //spawn an apple
+        new_apple();
+
+        //set the timer
+        tmr = new Timer(SPEED,this);
+        tmr.start();
+    }
+
+
+
+    /**
+     * Spawn an apple in the beginning and every time when the old one is eaten
+     */
+    public void new_apple(){
+        //x coordinates of the apple
+        appleX = rand_num.nextInt(SCREEN_WIDTH / UNIT_SIZE) * UNIT_SIZE;
+
+        //y coordinates of the apple
+        appleY = rand_num.nextInt(SCREEN_HEIGHT / UNIT_SIZE) * UNIT_SIZE;
+    }
+
+
+
+
+    /**
+     * Draw the graphics
+     */
+    public void draw(Graphics gr) {
+        if(isRunning){
+            //draw the apple
+            gr.setColor(Color.RED);
+            gr.fillOval(appleX,appleY,UNIT_SIZE,UNIT_SIZE);
+
+            //draw the snake
+            for(int i = 0; i < body_parts; i++){
+                //the head
+                if(i == 0){
+                    gr.setColor(Color.GREEN);
+                    gr.fill3DRect(x_axis[i],y_axis[i],UNIT_SIZE,UNIT_SIZE,true);
+                }else{
+                    //the body
+                    gr.setColor(new Color(140,44,40));
+                    gr.fill3DRect(x_axis[i],y_axis[i],UNIT_SIZE,UNIT_SIZE,false);
+                }
+            }
+        }else{
+            gameOver(gr);
+        }
+    }
+
+
+
+    /**
+     * Paint components in the super class
+     */
+    @Override
+    public void paintComponent(Graphics gr){
+        super.paintComponent(gr);
+        draw(gr);
+    }
+
+
+
+    /**
+     * Game over
+     */
+    public void gameOver(Graphics gr) {
+        //cast the graphics to 2D graphics
+        Graphics2D grp = (Graphics2D)gr;
+
+        //draw "Game over!"
+        grp.setFont(new Font("Fira Code",Font.PLAIN,28));
+        grp.setColor(Color.RED);
+        FontMetrics over_mtrcs = getFontMetrics(grp.getFont());
+        grp.drawString("Game over!",(SCREEN_WIDTH - over_mtrcs.stringWidth("Game over!")) / 2, SCREEN_HEIGHT / 2);
+    }
+
+
+
+    /**
+     * Move
+     */
+    public void move(){
+        for(int i = body_parts; i > 0; i--){
+            x_axis[i] = x_axis[i - 1];
+            y_axis[i] = y_axis[i - 1];
+        }
+
+        //change direction
+        switch(direction){
+            case 'R':
+                x_axis[0] += UNIT_SIZE;
+                break;
+            case 'L':
+                x_axis[0] -= UNIT_SIZE;
+                break;
+            case 'U':
+                y_axis[0] -= UNIT_SIZE;
+                break;
+            case 'D':
+                y_axis[0] += UNIT_SIZE;
+            break;
+        }
+    }
+
+
+    /**
+     * Check for collisions
+     */
+    public void check_coll(){
+        for(int i = body_parts; i > 0; i--){
+            if((x_axis[i] == x_axis[0]) && (y_axis[i] == y_axis[0])){
+                isRunning = false;
+            }
+        }
+
+        if(x_axis[0] < 0) {
+            x_axis[0] = getWidth() - UNIT_SIZE;
+        }
+
+        if(x_axis[0] > getWidth()) {
+            x_axis[0] = 0;
+        }
+
+        if(y_axis[0] < 0) {
+            y_axis[0] = getWidth() - UNIT_SIZE - menu_panel.getHeight();
+        }
+
+        if(y_axis[0] > getWidth() - menu_panel.getHeight()){
+            y_axis[0] = 0;
+        }
+    }
+
+
+
+
+    /**
+     * Check for eaten apples
+     */
+    public void check_apple(){
+        if((x_axis[0] == appleX) && (y_axis[0] == appleY)){
+            scores++;
+            body_parts++;
+
+            new_apple();
+        }
+    }
+
+
+
+
+
+    /**
+     * Key adapter for control keys
      */
     public class ControlAdapter extends KeyAdapter {
-
         @Override
-        public void keyPressed(KeyEvent control){
+        public void keyPressed(KeyEvent control) {
             switch(control.getKeyCode()){
-                case KeyEvent.VK_LEFT:
-                    if(direction != 'R'){
-                        direction = 'L';
-                    }
-                    break;
                 case KeyEvent.VK_RIGHT:
                     if(direction != 'L'){
                         direction = 'R';
+                    }
+                    break;
+                case KeyEvent.VK_LEFT:
+                    if(direction != 'R'){
+                        direction = 'L';
                     }
                     break;
                 case KeyEvent.VK_UP:
@@ -387,7 +476,7 @@ public class Container extends JPanel implements ActionListener {
                 break;
             }
         }
-
     }
+
 
 }
