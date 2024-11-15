@@ -11,12 +11,8 @@ package gamedata;
 
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Random;
 
 
@@ -55,94 +51,100 @@ public class Container extends JPanel implements ActionListener, MouseListener {
 
 
     /**
+     * new game
+     */
+    private JMenuItem new_game = new JMenuItem("new game");
+
+
+    /**
      * Screen width
      */
-    static final int SCREEN_WIDTH = 600;
+    private static final int SCREEN_WIDTH = 600;
 
 
     /**
      * Screen height
      */
-    static final int SCREEN_HEIGHT = 600;
+    private static final int SCREEN_HEIGHT = 600;
 
 
     /**
      * Size of one game unit
      */
-    static final int UNIT_SIZE = 20;
+    private static final int UNIT_SIZE = 20;
 
 
     /**
      * Game units(quantity)
      */
-    static final int UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
+    private static final int UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
 
 
     /**
      * Snake speed
      */
-    static final int SPEED = 120;
+    private static final int SPEED = 120;
 
 
     /**
      * x velocity
      */
-    final int[] x_axis = new int[UNITS];
+    private final int[] x_axis = new int[UNITS];
 
 
     /**
      * y velocity
      */
-    final int[] y_axis = new  int[UNITS];
+    private final int[] y_axis = new  int[UNITS];
 
 
     /**
      * Apple on x velocity
      */
-    int appleX;
+    private int appleX;
 
 
     /**
      * Apple on y velocity
      */
-    int appleY;
+    private int appleY;
 
 
     /**
      * Starting body parts of the snake
      */
-    int body_parts = 6;
+    private int body_parts = 6;
 
 
     /**
      * Scores
      */
-    int scores = 0;
+    private int scores = 0;
 
 
     /**
      * Main boolean
      */
-    boolean isRunning = false;
+    private boolean isRunning = false;
 
 
     /**
      * Direction of the snake
      *  starts moving right in the beginning
      */
-    char direction = 'R';
+    private char direction = 'R';
 
 
     /**
      * Timer
      */
-    Timer tmr;
+    private Timer tmr;
 
 
     /**
      * Random number to spawn an apple
      */
-    Random rand_num;
+    private Random rand_num;
 
 
 
@@ -162,7 +164,7 @@ public class Container extends JPanel implements ActionListener, MouseListener {
         menu_panel.setLayout(null);
 
         //scores label
-        scores_lbl.setBounds(250,4,200,30);
+        scores_lbl.setBounds(220,4,200,30);
         scores_lbl.setFont(new Font("Fira Code",Font.ITALIC,27));
         scores_lbl.setText("Scores " + scores);
         scores_lbl.setForeground(Color.white);
@@ -176,12 +178,21 @@ public class Container extends JPanel implements ActionListener, MouseListener {
         menu_panel.add(menu_bar);
 
         //Main menu
-        menu.setFont(new Font("Fira Code",Font.PLAIN,18));
+        menu.setFont(new Font("Fira Code",Font.PLAIN,16));
         menu.setForeground(Color.white);
         menu.setBackground(menu_bar.getBackground());
         menu.setBorder(null);
         menu.addMouseListener(this);
         menu_bar.add(menu);
+
+        //new game
+        new_game.setFont(new Font("Fira Code",Font.PLAIN,15));
+        new_game.setForeground(Color.white);
+        new_game.setBackground(new Color(32,30,34));
+        new_game.setBorder(null);
+        new_game.addActionListener(this);
+        new_game.addMouseListener(this);
+        menu.add(new_game);
 
         //setting up the container
         this.setBackground(new Color(32,30,34));
@@ -212,6 +223,30 @@ public class Container extends JPanel implements ActionListener, MouseListener {
             scores_lbl.setText("Scores " + scores);
         }
         repaint();
+
+
+        /**
+         * new game
+         */
+        if(actionEvent.getSource() == new_game){
+            //Warning
+            JOptionPane.showMessageDialog(null,"Scores will be lost!");
+
+            //reset the scores
+            scores = 0;
+
+            //center the snake
+            x_axis[0] = getWidth() / 2;
+            y_axis[0] = getHeight() / 2;
+
+            //set direction to the right
+            direction = 'R';
+
+            //start the game
+            isRunning = true;
+            new_apple();
+        }
+
     }
 
 
@@ -262,6 +297,14 @@ public class Container extends JPanel implements ActionListener, MouseListener {
         if(mouseEvent.getSource() == menu) {
             menu.setForeground(new Color(78,34,160));
         }
+
+        /**
+         * new game
+         */
+        if(mouseEvent.getSource() == new_game){
+            new_game.setFont(new Font((String)new_game.getFont().getFamily(),Font.PLAIN,17));
+        }
+
     }
 
     /**
@@ -282,6 +325,14 @@ public class Container extends JPanel implements ActionListener, MouseListener {
         if(mouseEvent.getSource() == menu) {
             menu.setForeground(Color.white);
         }
+
+        /**
+         * new game
+         */
+        if(mouseEvent.getSource() == new_game){
+            new_game.setFont(new Font((String)new_game.getFont().getFamily(),Font.PLAIN,15));
+        }
+
     }
 
 
